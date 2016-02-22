@@ -45,8 +45,11 @@ static int sim_dedup_ksocket_init(struct dm_target *ti)
 	int addr_len;
 	char * srv_ip_addr;
 
+<<<<<<< HEAD
 	struct sockaddr_in addr;
 
+=======
+>>>>>>> 3ad11c0565c5cfeec047165131f6815c0fb67db8
 #ifdef KSOCKET_ADDR_SAFE
 	mm_segment_t old_fs;
 	old_fs = get_fs();
@@ -102,6 +105,10 @@ static int sim_dedup_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 	unsigned long long tmp;
 
 	int s;
+<<<<<<< HEAD
+=======
+	char buf[1024];
+>>>>>>> 3ad11c0565c5cfeec047165131f6815c0fb67db8
 
 	if (argc != 2) {
 		ti->error = "Invalid argument count";
@@ -131,6 +138,14 @@ static int sim_dedup_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 
 	s =	sim_dedup_ksocket_init(ti);
 
+<<<<<<< HEAD
+=======
+	strcpy(buf, "sim_dedup_ctr is called\n");
+	ksend(sdc->sock, buf, sizeof(buf), 0);
+//	krecv(sdc->sock, buf, sizeof(buf), 0);
+//	printk("User MSG : %s\n", buf);
+	
+>>>>>>> 3ad11c0565c5cfeec047165131f6815c0fb67db8
 	if(s < 0){
 		ti->error = "ksocket error";
 		return -EINVAL;
@@ -161,12 +176,16 @@ static sector_t sim_dedup_map_sector(struct dm_target *ti, sector_t bi_sector)
 static void sim_dedup_map_bio(struct dm_target *ti, struct bio *bio)
 {
 	struct sim_dedup_c *sdc = ti->private;
+<<<<<<< HEAD
 	char buf[1024];
 
 	strcpy(buf, "sim_dedup_map_bio is called\n");
 	ksend(sdc->sock, buf, sizeof(buf), 0);
 	krecv(sdc->sock, buf, sizeof(buf), 0);
 	printk("User MSG : %s\n", buf);
+=======
+
+>>>>>>> 3ad11c0565c5cfeec047165131f6815c0fb67db8
 
 	bio->bi_bdev = sdc->dev->bdev;
 	if (bio_sectors(bio))

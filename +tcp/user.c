@@ -46,8 +46,13 @@ int main(int argc, char **argv)
 
         if(!strcmp(buf, "End of Dedup"))
             break;
+<<<<<<< HEAD
 		strcpy(buf, "Hello Ksocket\n");
         write(clnt_sock, buf, sizeof(buf)); /* 데이터 전송 */
+=======
+		//strcpy(buf, "Hello Ksocket\n");
+        //write(clnt_sock, buf, sizeof(buf)); /* 데이터 전송 */
+>>>>>>> 3ad11c0565c5cfeec047165131f6815c0fb67db8
     }
 
     close(clnt_sock); /* 연결 종료 */
