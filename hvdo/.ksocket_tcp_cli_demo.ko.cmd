@@ -1,0 +1,1 @@
+cmd_/root/dedup/hvdo/ksocket_tcp_cli_demo.ko := ld -r -m elf_x86_64 -T /usr/src/kernels/linux-2.6.32.27/scripts/module-common.lds --build-id -o /root/dedup/hvdo/ksocket_tcp_cli_demo.ko /root/dedup/hvdo/ksocket_tcp_cli_demo.o /root/dedup/hvdo/ksocket_tcp_cli_demo.mod.o

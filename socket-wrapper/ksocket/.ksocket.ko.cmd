@@ -1,0 +1,1 @@
+cmd_/root/dedup/socket-wrapper/ksocket/ksocket.ko := ld -r -m elf_x86_64 -T /usr/src/kernels/linux-2.6.32.27/scripts/module-common.lds --build-id -o /root/dedup/socket-wrapper/ksocket/ksocket.ko /root/dedup/socket-wrapper/ksocket/ksocket.o /root/dedup/socket-wrapper/ksocket/ksocket.mod.o

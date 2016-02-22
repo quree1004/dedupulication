@@ -1,0 +1,1 @@
+cmd_/root/dedup/+tcp/sim_dedup.ko := ld -r -m elf_x86_64 -T /usr/src/kernels/linux-2.6.32.27/scripts/module-common.lds --build-id -o /root/dedup/+tcp/sim_dedup.ko /root/dedup/+tcp/sim_dedup.o /root/dedup/+tcp/sim_dedup.mod.o
