@@ -10,15 +10,27 @@
 #define	DATA_SUPERBLOCK_LOCATION	0
 #define	METADATA_BSIZE				4096
 #define METADATA_CACHESIZE			64
-#define MEDATA+MAXLOCKS				5
+#define METADATA_MAXLOCKS			5
 
-struct my_data_s {
+struct btree_ops{
+	int (*btree_delete)(struct btree_store *bs, void *key, int32_t ksize);
+	int (*btree_search)(struct btree_store *bs, void *key, int32_t ksize,
+				void *value, int32_t *vsize);
+	int (*btree_insert)(struct btree_store *bs, void *key, int32_t ksize,
+				void *value, int32_t *vsize);
+};
+
+
+struct btree_store {
 	uint32_t key_size;
 	uint32_t value_size;
+	uint32_t entry_size;
 
 	struct dm_btree_info tree_info;
 	uint64_t root;
-}
+	
+	struct btree_ops bops;
+};
 
 
 struct metadata {
@@ -27,8 +39,9 @@ struct metadata {
 	struct dm_space_map *data_sm;
 	struct dm_space_map *meta_sm;
 
-	struct my_data_s *data;
-}
+	struct btree_store *hash_pbn;
+	struct btree_store *lbn_pbn;
+};
 
 struct metadata_superblock {
 	__le32 csum;
@@ -43,8 +56,9 @@ struct metadata_superblock {
 	__le32 metadata_block_size; /* In bytes */
 	__le64 metadata_nr_blocks;/* Number of metadata blocks used. */
 
-	__le64 my_data_root;
-}
+	__le64 hash_pbn_root;
+	__le64 lbn_pbn_root;
+};
 
 static int __begin_transaction(struct metadata *md)
 {
@@ -59,8 +73,10 @@ static int __begin_transaction(struct metadata *md)
 		return r;
 
 	disk_super = dm_block_data(sblock);
+	
 
-	md->data->root = le64_to_cpu(disk_super->my_data_root);
+	md->hash_pbn->root = le64_to_cpu(disk_super->hash_pbn_root);
+	md->lbn_pbn->root = le64_to_cpu(disk_super->lbn_pbn_root);
 
 	dm_bm_unlock(sblock);
 
@@ -93,7 +109,8 @@ static int __commit_transaction(struct metadata *md)
 	if(r < 0) return r;
 
 	disk_super = dm_block_data(sblock);
-	disk_super->my_data_root = cpu_to_le64(md->data->root);
+	disk_super->lbn_pbn_root = cpu_to_le64(md->lbn_pbn->root);
+	disk_super->hash_pbn_root = cpu_to_le64(md->hash_pbn->root);
 
 	r = dm_sm_copy_root(md->meta_sm, &disk_super->metadata_space_map_root, metadata_len);
 	if(r < 0) goto unlock;
@@ -403,7 +420,10 @@ static struct my_data_s  *create_btree(struct metadata *md, uint32_t key_size,
 	dt->tree_info.value_type.equal = NULL;
 
 	if(!unformatted){
-		md->data = dt;
+		if(key_size == 8)
+			md->lbn_pbn = dt;
+		else
+			md->hash_pbn = dt;
 		__begin_transaction(md);
 	}
 	else
@@ -413,12 +433,14 @@ static struct my_data_s  *create_btree(struct metadata *md, uint32_t key_size,
 			dt = ERR_PTR(r);
 			kfree(dt);
 		}
-		md->data = dt;
+		if(key_size == 8)
+			md->lbn_pbn = dt;
+		else
+			md->hash_pbn = dt;
 		flush_btree(md);
 	}
 
-	md->data = dt;
-
+	return dt;
 }
 
 
