@@ -1,2 +1,0 @@
-kernel//root/dedup/+tcp/sim_dedup.ko
-kernel//root/dedup/+tcp/ksocket.ko
