@@ -44,7 +44,8 @@ struct ssddup_c{
 
 	uint64_t logical_blk_counter;
 	uint64_t physical_blk_counter;
-
+	
+	struct workqueue_struct *workqueue;
 	struct dm_io_client *io_client;
 
 	char crypto_alg[CRYPTO_ALG_NAME_LEN];
