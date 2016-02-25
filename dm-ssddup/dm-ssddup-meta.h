@@ -34,6 +34,10 @@ struct metadata_ops {
 	
 	int(*flush_meta)(struct metadata *md);
 
+	int(*get_private_data)(struct metadata *md, void **data,
+		uint32_t size);
+	int(*set_private_data)(struct metadata *md, void *data, uint32_t size);
+
 };
 extern struct metadata_ops metadata_ops_btree;
 

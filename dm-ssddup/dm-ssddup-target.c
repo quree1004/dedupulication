@@ -22,6 +22,50 @@ struct ssddup_work {
 	struct bio *bio;
 };
 
+
+
+
+static void process_bio(struct work_struct *ws)
+{
+	struct ssddup_work *data = container_of(ws, struct ssddup_work, worker);
+	struct ssddup_c *sc = (struct ssddup_c *)data->sc;
+	struct bio *bio = (struct bio *)data->bio;
+
+	mempool_free(data, sc->ssdup_mempool);
+
+	switch (bio_data_dir(bio)){
+	case READ :
+		handle_read(sc, bio);
+	case WRITE :
+		handle_write(sc, bio);
+	default:
+		DMERR("NO READ NO WRITE");
+		bio_endio(bio, -EINVAL);
+	}
+}
+
+static int dm_dedup_map(struct dm_target *ti, struct bio *bio)
+{
+//	struct ssddup_work *data;
+//	
+//	data = mempool_alloc(sc->ssddup_mempool, GFP_NOIO);
+//	if (!data) {
+//		bio_endio(bio, -ENOMEM);
+//		goto out;
+//	}
+//
+//	data->bio = bio;
+//	data->sc = sc;
+//
+//	INIT_WORK(&(data->worker), process_bio);
+//
+//	queue_work(sc->workqueue, &(data->worker));
+//
+//out :
+//	return DM_MAPIO_SUBMITTED;
+	return DM_MAPIO_REMAPPED;
+}
+
 struct ssddup_args{
 	struct dm_target *ti;
 	struct dm_dev *meta_dev;
@@ -180,46 +224,41 @@ static int dm_ssddup_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 	if (r < 0)
 		BUG();
 
-	if (!unformatted) {
+	if (!unformatted && sc->mdops->get_pirvate_data) {
+		r = dc->mdops->get_private_data(md, (void **)&data, sizeof(struct on_disk_stats));
+		if (r < 0)
+			BUG();
+
 		logical_block_counter = data->logical_block_counter;
 		physical_block_counter = data->physical_block_counter;
 	}
 
-	dc->data_dev = da.data_dev;
-	dc->metadata_dev = da.meta_dev;
+	sc->data_dev = sa.data_dev;
+	sc->metadata_dev = sa.meta_dev;
 
-	dc->workqueue = wq;
-	dc->dedup_work_pool = dedup_work_pool;
-	dc->bmd = md;
+	sc->workqueue = wq;
+	sc->dedup_work_pool = dedup_work_pool;
+	sc->md = md;
 
-	dc->logical_block_counter = logical_block_counter;
-	dc->physical_block_counter = physical_block_counter;
+	sc->logical_block_counter = logical_block_counter;
+	sc->physical_block_counter = physical_block_counter;
 
-	dc->writes = 0;
-	dc->dupwrites = 0;
-	dc->uniqwrites = 0;
-	dc->reads_on_writes = 0;
-	dc->overwrites = 0;
-	dc->newwrites = 0;
+	strcpy(sc->crypto_alg, sa.hash_algo);
+	sc->crypto_key_size = crypto_key_size;
 
-	strcpy(dc->crypto_alg, da.hash_algo);
-	dc->crypto_key_size = crypto_key_size;
+	sc->flush_limit = flushrq;
+	sc->writes_after_flush = 0;
 
-	dc->flushrq = flushrq;
-	dc->writes_after_flush = 0;
-
-	r = dm_set_target_max_io_len(ti, dc->sectors_per_block);
+	r = dm_set_target_max_io_len(ti, sc->sector_num_per_blk);
 	if (r)
-		goto bad_kvstore_init;
+		goto bad_metastore_init;
 
-	ti->private = dc;
+	ti->private = sc;
 
 	return 0;
 
 bad_metastore_init:
 	desc_table_deinit(sc->desc_table);
-
-
 bad_meta_init:
 	if (md && !IS_ERR(md))
 		dc->mdops->exit_meta(md);
@@ -233,6 +272,42 @@ bad_wq :
 out : 
 	destroy_ssddup_args(&da);
 	return r;
+}
+
+static int dm_ssddup_dtr(struct dm_target *ti)
+{
+	struct ssddup_c *sc ti->private;
+	struct on_disk_stats data;
+	int r;
+
+	if (sc->mdops->set_private_data){
+		data.physical_block_counter = sc->physical_block_counter;
+		data.logical_block_counter = sc->logical_block_counter;
+
+		r = cc->mdops->set_private_data(sc->md, &data,
+			sizeof(struct on_disk_stats));
+		if (r < 0)
+			BUG();
+	}
+
+	r = sc->mdops->flush_meta(sc->md);
+	if (r < 0)
+		BUG();
+
+	flush_workqueue(sc->workqueue);
+	destroy_workqueue(sc->workqueue);
+
+	mempool_destroy(sc->ssddup_mempool);
+
+	dc->mdops->exit_meta(sc->md);
+
+	dm_io_client_destroy(sc->io_client);
+
+	dm_put_device(ti, sc->data_dev);
+	dm_put_device(ti, sc->meta_dev);
+	desc_table_deinit(sc->desc_table);
+
+	kfree(sc);
 }
 
 static struct target_type dm_ssddup_target = {
