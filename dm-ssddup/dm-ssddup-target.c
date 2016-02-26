@@ -96,21 +96,21 @@ static int parse_ssddup_args(struct ssddup_args *sa, int argc, char **argv, char
 	as.argc = argc;
 	as.argv = argv;
 
-	r = dm_get_device(sa->ti, dm_shift_arg(as),
+	r = dm_get_device(sa->ti, dm_shift_arg(&as),
 		dm_table_get_mode(sa->ti->table), &sa->meta_dev);
 	if (r){
 		*err = "ERR Open meta dev";
 		return r;
 	}
 
-	r = dm_get_device(sa->ti, dm_shift_arg(as),
+	r = dm_get_device(sa->ti, dm_shift_arg(&as),
 		dm_table_get_mode(sa->ti->table), &sa->data_dev);
 	if (r){
 		*err = "ERR Open data dev";
 		return r;
 	}
 
-	strlcpy(sa->hash_algo, dm_shift_arg(as), CRYPTO_ALG_NAME_LEN);
+	strlcpy(sa->hash_algo, dm_shift_arg(&as), CRYPTO_ALG_NAME_LEN);
 	if (!crypto_has_hash(sa->hash_algo, 0, CRYPTO_ALG_ASYNC)){
 		*err = "ERR Unsupported hash algorithm";
 		return -EINVAL;
@@ -160,7 +160,7 @@ static int dm_ssddup_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 		goto bad_wq;
 	}
 
-	ssddup_work_pool = mempool_create_kmalloc_pool(MIN_DEDUP_WORK_IO,
+	ssddup_mempool = mempool_create_kmalloc_pool(MIN_DEDUP_WORK_IO,
 		sizeof(struct ssddup_work));
 	if (!ssddup_work_pool){
 		r = -ENOMEM;
@@ -226,7 +226,7 @@ static int dm_ssddup_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 		BUG();
 
 	if (!unformatted && sc->mdops->get_private_data) {
-		r = dc->mdops->get_private_data(md, (void **)&data, sizeof(struct on_disk_stats));
+		r = sc->mdops->get_private_data(md, (void **)&data, sizeof(struct on_disk_stats));
 		if (r < 0)
 			BUG();
 
@@ -265,7 +265,7 @@ bad_meta_init:
 		sc->mdops->exit_meta(md);
 	dm_io_client_destroy(sc->io_client);
 bad_io_client :
-	mempool_destroy(dedup_work_pool);
+	mempool_destroy(ssddup_mempool);
 bad_mempool:
 	destroy_workqueue(wq);
 bad_wq :
@@ -282,8 +282,8 @@ static void dm_ssddup_dtr(struct dm_target *ti)
 	int r;
 
 	if (sc->mdops->set_private_data){
-		data.physical_block_counter = sc->physical_block_counter;
-		data.logical_block_counter = sc->logical_block_counter;
+		data.physical_block_counter = sc->physical_blk_counter;
+		data.logical_block_counter = sc->logical_blk_counter;
 
 		r = sc->mdops->set_private_data(sc->md, &data,
 			sizeof(struct on_disk_stats));
