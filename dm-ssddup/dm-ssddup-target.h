@@ -30,7 +30,7 @@
 #define MAX_DIGEST_SIZE	SHA256_DIGEST_SIZE
 
 #define MIN_DEDUP_WORK_IO	16
-
+#define DM_MSG_PREFIX "ssddup-mod"
 
 struct ssddup_c{
 	struct dm_dev *meta_dev;

@@ -12,6 +12,16 @@
 #define METADATA_CACHESIZE			64
 #define METADATA_MAXLOCKS			5
 
+struct btree_store {
+	uint32_t key_size;
+	uint32_t value_size;
+	uint32_t entry_size;
+
+	struct dm_btree_info tree_info;
+	uint64_t root;
+
+	struct btree_ops bops;
+};
 
 static int __begin_transaction(struct metadata *md)
 {

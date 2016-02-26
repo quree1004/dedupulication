@@ -1,5 +1,5 @@
 
-#include <linux/vmalloc.c>
+#include <linux/vmalloc.h>
 
 #include "dm-ssddup-target.h"
 #include "dm-ssddup-meta.h"
@@ -22,7 +22,8 @@ struct ssddup_work {
 	struct bio *bio;
 };
 
-
+void handle_read(struct ssddup_c *sc, struct bio *bio);
+void handle_write(struct ssddup_c *sc, struct bio *bio);
 
 
 static void process_bio(struct work_struct *ws)
@@ -31,7 +32,7 @@ static void process_bio(struct work_struct *ws)
 	struct ssddup_c *sc = (struct ssddup_c *)data->sc;
 	struct bio *bio = (struct bio *)data->bio;
 
-	mempool_free(data, sc->ssdup_mempool);
+	mempool_free(data, sc->ssddup_mempool);
 
 	switch (bio_data_dir(bio)){
 	case READ :
@@ -82,7 +83,7 @@ static void destroy_ssddup_args(struct ssddup_args *sa)
 		dm_put_device(sa->ti, sa->data_dev);
 }
 
-static int parse_args(struct ssddup_args *sa, int argc, char **argv, char **err)
+static int parse_ssddup_args(struct ssddup_args *sa, int argc, char **argv, char **err)
 {
 	struct dm_arg_set as;
 	int r;
@@ -95,21 +96,21 @@ static int parse_args(struct ssddup_args *sa, int argc, char **argv, char **err)
 	as.argc = argc;
 	as.argv = argv;
 
-	r = dm_get_device(sa->ti, dm_shift_args(sa),
+	r = dm_get_device(sa->ti, dm_shift_arg(sa),
 		dm_table_get_mode(sa->ti->table), &sa->meta_dev);
 	if (r){
 		*err = "ERR Open meta dev";
 		return r;
 	}
 
-	r = dm_get_device(sa->ti, dm_shift_args(sa),
+	r = dm_get_device(sa->ti, dm_shift_arg(sa),
 		dm_table_get_mode(sa->ti > table), &sa->data_dev);
 	if (r){
 		*err = "ERR Open data dev";
 		return r;
 	}
 
-	strlcpy(sa->hash_algo, dm_shift_args(as), CRYPTO_ALG_NAME_LEN);
+	strlcpy(sa->hash_algo, dm_shift_arg(as), CRYPTO_ALG_NAME_LEN);
 	if (!crypto_has_hash(sa->hash_algo), 0, CRYPTO_ALG_ASYNC){
 		*err = "ERR Unsupported hash algorithm";
 		return -EINVAL;
@@ -141,7 +142,7 @@ static int dm_ssddup_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 	memset(&sa, 0, sizeof(struct ssddup_args));
 	sa.ti = ti;
 
-	r = parse_args(&sa, argc, argv, &ti->error));
+	r = parse_ssddup_args(&sa, argc, argv, &ti->error));
 	if (r)
 		goto out;
 	

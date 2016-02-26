@@ -49,16 +49,7 @@ struct btree_ops {
 		void *value, int32_t vsize);
 };
 
-struct btree_store {
-	uint32_t key_size;
-	uint32_t value_size;
-	uint32_t entry_size;
 
-	struct dm_btree_info tree_info;
-	uint64_t root;
-
-	struct btree_ops bops;
-};
 
 struct metadata {
 	struct dm_block_manager *meta_bm;
