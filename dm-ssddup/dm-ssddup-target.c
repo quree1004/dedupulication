@@ -162,7 +162,7 @@ static int dm_ssddup_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 
 	ssddup_mempool = mempool_create_kmalloc_pool(MIN_DEDUP_WORK_IO,
 		sizeof(struct ssddup_work));
-	if (!ssddup_work_pool){
+	if (!ssddup_mempool){
 		r = -ENOMEM;
 		ti->error = "ERR create mempool";
 		goto bad_mempool;

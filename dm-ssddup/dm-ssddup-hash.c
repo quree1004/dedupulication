@@ -10,8 +10,8 @@
  * This file is released under the GPL.
  */
 
-#include "dm-dedup-target.h"
-#include "dm-dedup-hash.h"
+#include "dm-ssddup-target.h"
+#include "dm-ssddup-hash.h"
 #include <linux/atomic.h>
 #include <linux/blk_types.h>
 

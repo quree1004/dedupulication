@@ -26,7 +26,7 @@ struct btree_store {
 static int __begin_transaction(struct metadata *md)
 {
 	int r;
-	struct meta_superblock *disk_super;
+	struct metadata_superblock *disk_super;
 	struct dm_block *sblock;
 
 	r = dm_bm_read_lock(md->meta_bm, DATA_SUPERBLOCK_LOCATION,
@@ -48,8 +48,8 @@ static int __begin_transaction(struct metadata *md)
 static int __commit_transaction(struct metadata *md)
 {
 	int r = 0;
-	size_t metadat_len, data_len;
-	struct thin_disk_superblock *disk_super;
+	size_t meta_len, data_len;
+	struct metadata_superblock *disk_super;
 	struct dm_block *sblock;
 
 	BUILD_BUG_ON(sizeof(struct metadata_superblock) > 512);
@@ -79,7 +79,7 @@ static int __commit_transaction(struct metadata *md)
 	disk_super->lbn_pbn_root = cpu_to_le64(md->bs_lbn_pbn->root);
 	disk_super->hash_pbn_root = cpu_to_le64(md->bs_hash_pbn->root);
 
-	r = dm_sm_copy_root(md->meta_sm, &disk_super->metadata_space_map_root, metadata_len);
+	r = dm_sm_copy_root(md->meta_sm, &disk_super->metadata_space_map_root, meta_len);
 	if(r < 0) 
 		goto unlock;
 
@@ -99,13 +99,13 @@ static int __write_initial_superblock(struct metadata *md)
 	int r;
 	size_t meta_len, data_len;
 	struct dm_block *sblock;
-	struct metadata_superblcok *disk_super;
+	struct metadata_superblock *disk_super;
 
 	r = dm_sm_root_size(md->meta_sm, &meta_len);
 	if(r < 0) 
 		return r;
 
-	r = dm_sm root_size(md->data_sm, &data_len);
+	r = dm_sm_root_size(md->data_sm, &data_len);
 	if(r < 0) 
 		return r;
 
@@ -136,7 +136,7 @@ unlock :
 	return r;
 }
 
-static int __superblock_all_zeroes(struct dm_block_manager *bm, int *result)
+static int __superblock_all_zeros(struct dm_block_manager *bm, int *result)
 {
 	int r;
 	unsigned i;
@@ -170,10 +170,11 @@ static struct metadata *init_btree(void * param, int *unformatted)
 	struct dm_space_map *meta_sm;
 	struct dm_space_map *data_sm;
 	struct init_btree_param *ibp = (struct init_btree_param *)param;
+	struct dm_transaction_manager *tm;
+	
+	DMINFO("Init btree");
 
-	DMINFO("Initializing btree");
-
-	md = kzalloc(sizeof(*md), GFP_ONIO);
+	md = kzalloc(sizeof(*md), GFP_NOIO);
 	if(!md)
 		return ERR_PTR(-ENOMEM);
 
@@ -184,7 +185,7 @@ static struct metadata *init_btree(void * param, int *unformatted)
 		goto badbm;
 	}
 
-	r = superblock_all_zeros(meta_bm, unformatted);
+	r = __superblock_all_zeros(meta_bm, unformatted);
 	if(r) {
 		md = ERR_PTR(r);
 		goto badtm;
@@ -237,21 +238,21 @@ static struct metadata *init_btree(void * param, int *unformatted)
 	md->meta_sm = meta_sm;
 	md->data_sm = data_sm;
 
-	r = write_initial_superblock(md);
+	r = __write_initial_superblock(md);
 	if(r < 0){
 		md = ERR_PTR(r);
 		goto badwritesuper;
 	}
 
 begin_trans :
-	r = __begin_transacntion(md);
+	r = __begin_transaction(md);
 	if(r < 0) {
 		md = ERR_PTR(r);
 		goto badwritesuper;
 	}
 
 	md->bs_hash_pbn = NULL;
-	bd->bs_lbn_pbn = NULL;
+	md->bs_lbn_pbn = NULL;
 
 	return md;
 
@@ -267,16 +268,16 @@ badbm :
 	return md;
 }
 //----------------------------------------------------------------
-static void *exit_btree(struct metadata *md)
+static void exit_btree(struct metadata *md)
 {
 	int r;
 
 	r = __commit_transaction(md);
 	if(r < 0)
-		DMWARN("%S: __commit_transaction() failed, error = %d", __func__, r);
+		DMWARN("%s: __commit_transaction() failed, error = %d", __func__, r);
 
 	dm_sm_destroy(md->data_sm);
-	dm_tm_destory(md->tm);
+	dm_tm_destroy(md->tm);
 	dm_sm_destroy(md->meta_sm);
 	dm_block_manager_destroy(md->meta_bm);
 
@@ -293,7 +294,7 @@ static int flush_btree(struct metadata *md)
 	r = __commit_transaction(md);
 
 	if (r < 0) {
-		DWARN("%S: __commit_transaction() failed, error = %d", __func__, r);
+		DMWARN("%s: __commit_transaction() failed, error = %d", __func__, r);
 		return r;
 	}
 
@@ -337,13 +338,17 @@ static int lbn_pbn_delete_btree(struct btree_store *bs, void *key, int32_t ksize
 {
 	int r;
 
-	if(key_size != dt->key_size) return -EINVAL;
+	if(ksize != bs->key_size) 
+		return -EINVAL;
 
 	r = dm_btree_remove(&(bs->tree_info), bs->root, key, &(bs->root));
 
-	if(r == -ENODATA) return -ENODEV;
-	else if (r >= 0) return 0;
-	else return r;
+	if(r == -ENODATA) 
+		return -ENODEV;
+	else if (r >= 0) 
+		return 0;
+	else 
+		return r;
 }
 
 static int lbn_pbn_search_btree(struct btree_store *bs, void *key, int32_t kszie,
@@ -351,13 +356,17 @@ static int lbn_pbn_search_btree(struct btree_store *bs, void *key, int32_t kszie
 {
 	int r;
 
-	if(ksize != bs->key_size) return -EINVAL;
+	if(ksize != bs->key_size) 
+		 return -EINVAL;
 
 	r = dm_btree_lookup(&(bs->tree_info), bs->root, key, value);
 
-	if(r == -ENODATA) return 0; // not found
-	else if(r >= 0) return 1; // found
-	else return 0; // error
+	if(r == -ENODATA) 
+		return 0; // not found
+	else if(r >= 0) 
+		return 1; // found
+	else 
+		return 0; // error
 }
 
 static int lbn_pbn_insert_btree(struct btree_store *bs, void *key, int32_t kszie,
@@ -367,7 +376,7 @@ static int lbn_pbn_insert_btree(struct btree_store *bs, void *key, int32_t kszie
 		vsize != bs->value_size)
 		return -EINVAL;
 
-	return dm_btree_insert(&(dt->tree_info), bs->root, key, value, &(bs->root));
+	return dm_btree_insert(&(bs->tree_info), bs->root, key, value, &(bs->root));
 }
 
 static struct btree_store *lbn_pbn_create_btree(struct metadata *md, uint32_t ksize,
@@ -383,7 +392,7 @@ static struct btree_store *lbn_pbn_create_btree(struct metadata *md, uint32_t ks
 	if (ksize != 8) 
 		return ERR_PTR(-ENOTSUPP); // persistent data support until 64bit key
 	
-	if (md->data) 
+	if (md->bs_lbn_pbn) 
 		return ERR_PTR(-EBUSY);
 
 	bs = kmalloc(sizeof(*bs), GFP_NOIO);
@@ -412,9 +421,9 @@ static struct btree_store *lbn_pbn_create_btree(struct metadata *md, uint32_t ks
 	}
 	else
 	{
-		r = dm_btree_empty(&(dt->tree_info), &(dt->root));
+		r = dm_btree_empty(&(bs->tree_info), &(bs->root));
 		if(r < 0){
-			dt = ERR_PTR(r);
+			bs = ERR_PTR(r);
 			kfree(bs);
 			return bs;
 		}
@@ -455,7 +464,7 @@ static int hash_pbn_delete_btree(struct btree_store *bs, void *key, int32_t ksiz
 			return -ENODEV;
 		else if (r >= 0){
 			if (!memcmp(entry, key, ksize)){
-				r = dm_btree_remove(&(bs->tree_info)), bs->root, &cut_key, &(bs->root));
+				r = dm_btree_remove(&(bs->tree_info), bs->root, &cut_key, &(bs->root));
 				kfree(entry);
 				return r;
 			}
@@ -465,9 +474,9 @@ static int hash_pbn_delete_btree(struct btree_store *bs, void *key, int32_t ksiz
 			kfree(entry);
 			return r;
 		}
-	} while (r>=0)
+	} while (r>=0);
 }
-static int hash_pbn_search_btree(struct btree_store *bs, void *key, int32_t kszie,
+static int hash_pbn_search_btree(struct btree_store *bs, void *key, int32_t ksize,
 	void *value, int32_t *vsize)
 {
 	char *entry;
@@ -501,7 +510,7 @@ static int hash_pbn_search_btree(struct btree_store *bs, void *key, int32_t kszi
 			kfree(entry);
 			return r;
 		}
-	} while (r >= 0)
+	} while (r >= 0);
 }
 static int hash_pbn_insert_btree(struct btree_store *bs, void *key, int32_t kszie,
 	void *value, int32_t vsize)
@@ -537,7 +546,7 @@ static int hash_pbn_insert_btree(struct btree_store *bs, void *key, int32_t kszi
 			kfree(entry);
 			return r;
 		}
-	} while (r >= 0)
+	} while (r >= 0);
 }
 static struct btree_store *hash_pbn_create_btree(struct metadata *md, uint32_t ksize,
 	uint32_t vsize, uint32_t kmax, int unformatted)
@@ -549,7 +558,7 @@ static struct btree_store *hash_pbn_create_btree(struct metadata *md, uint32_t k
 	if (!vsize || !ksize)
 		return ERR_PTR(-ENOTSUPP);
 
-	if (md->data)
+	if (md->bs_hash_pbn)
 			return ERR_PTR(-EBUSY);
 
 	bs = kmalloc(sizeof(*bs), GFP_NOIO);
@@ -579,9 +588,9 @@ static struct btree_store *hash_pbn_create_btree(struct metadata *md, uint32_t k
 	}
 	else
 	{
-		r = dm_btree_empty(&(dt->tree_info), &(dt->root));
+		r = dm_btree_empty(&(bs->tree_info), &(bs->root));
 		if (r < 0){
-			dt = ERR_PTR(r);
+			bs = ERR_PTR(r);
 			kfree(bs);
 			return bs;
 		}
@@ -591,9 +600,6 @@ static struct btree_store *hash_pbn_create_btree(struct metadata *md, uint32_t k
 
 	return bs;
 }
-
-
-
 
 struct metadata_ops metadata_ops_btree = {
 	.init_meta = init_btree,
@@ -607,8 +613,6 @@ struct metadata_ops metadata_ops_btree = {
 
 	.flush_meta = flush_btree,
 };
-
-
 
 
 

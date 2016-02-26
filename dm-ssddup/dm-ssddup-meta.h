@@ -13,6 +13,15 @@
 #include <linux/string.h>
 #include <linux/gfp.h>
 
+#include <linux/scatterlist.h>
+#include <asm/page.h>
+#include <asm/unaligned.h>
+#include <crypto/hash.h>
+#include <crypto/md5.h>
+#include <crypto/algapi.h>
+
+#include "dm-ssddup-target.h"
+
 #define SPACE_MAP_ROOT_SIZE			128
 
 
@@ -22,10 +31,10 @@ struct metadata_ops {
 	
 	struct btree_store * (*bs_create_lbn_pbn)(struct metadata *md,
 		uint32_t ksize, uint32_t vsize, uint32_t kmax,
-		bool unformatted);
+		int unformatted);
 	struct btree_store * (*bs_create_hash_pbn)(struct metadata *md,
 		uint32_t ksize, uint32_t vsize, uint32_t knummax,
-		bool unformatted);
+		int unformatted);
 
 	int(*alloc_data_block)(struct metadata *md, uint64_t *blockn);
 	int(*inc_refcount)(struct metadata *md, uint64_t blockn);
@@ -82,26 +91,6 @@ struct init_btree_param{
 	struct block_device *meta_bdev;
 	uint64_t blocks;
 };
-
-static int __begin_transaction(struct metadata *md);
-
-static int __commit_transaction(struct metadata *md);
-
-static int __write_initial_superblock(struct metadata *md);
-
-static int __superblock_all_zeroes(struct dm_block_manager *bm, int *result);
-
-
-//// general btree operation
-static struct metadata *init_btree(void * param, int *unformatted);
-static void *exit_btree(struct metadata *md); 
-static int flush_btree(struct metadata *md);
-
-////space management using space_map
-static int alloc_data_block(struct metadata *md, uint64_t *blockn);
-static int inc_refcnt(struct metadata *md, uint64_t blockn);
-static int dec_refcnt(struct metadata *md, uint64_t blockn);
-static int get_refcnt(struct metadata *md, uint64_t blockn);
 
 
 
