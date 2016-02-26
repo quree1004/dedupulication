@@ -17,7 +17,7 @@
 
 
 struct metadata_ops {
-	struct metadata * (*init_meta)(void *init_param, bool *unformatted);
+	struct metadata * (*init_meta)(void *init_param, int *unformatted);
 	void(*exit_meta)(struct metadata *md);
 	
 	struct btree_store * (*bs_create_lbn_pbn)(struct metadata *md,
