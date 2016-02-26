@@ -512,7 +512,7 @@ static int hash_pbn_search_btree(struct btree_store *bs, void *key, int32_t ksiz
 		}
 	} while (r >= 0);
 }
-static int hash_pbn_insert_btree(struct btree_store *bs, void *key, int32_t kszie,
+static int hash_pbn_insert_btree(struct btree_store *bs, void *key, int32_t ksize,
 	void *value, int32_t vsize)
 {
 	char *entry;
