@@ -356,7 +356,7 @@ static int lbn_pbn_search_btree(struct btree_store *bs, void *key, int32_t kszie
 {
 	int r;
 
-	if(ksize != bs->key_size) 
+	if(ksize != (bs->key_size)) 
 		 return -EINVAL;
 
 	r = dm_btree_lookup(&(bs->tree_info), bs->root, key, value);
