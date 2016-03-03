@@ -168,7 +168,7 @@ static struct metadata *init_btree(void * param, int *unformatted)
 	struct metadata *md;
 	struct dm_block_manager *meta_bm;
 	struct dm_space_map *meta_sm;
-	struct dm_space_map *data_sm;
+	struct dm_space_map *data_sm = NULL;
 	struct init_btree_param *ibp = (struct init_btree_param *)param;
 	struct dm_transaction_manager *tm;
 	
@@ -356,7 +356,7 @@ static int lbn_pbn_search_btree(struct btree_store *bs, void *key, int32_t kszie
 {
 	int r;
 
-	if(ksize != (bs->key_size)) 
+	if(ksize != (int32_t)(bs->key_size)) 
 		 return -EINVAL;
 
 	r = dm_btree_lookup(&(bs->tree_info), bs->root, key, value);
@@ -372,8 +372,8 @@ static int lbn_pbn_search_btree(struct btree_store *bs, void *key, int32_t kszie
 static int lbn_pbn_insert_btree(struct btree_store *bs, void *key, int32_t kszie,
 		void *value, int32_t vsize)
 {
-	if (ksize != bs->key_size ||
-		vsize != bs->value_size)
+	if (ksize != (int32_t)bs->key_size ||
+		vsize != (int32_t)bs->value_size)
 		return -EINVAL;
 
 	return dm_btree_insert(&(bs->tree_info), bs->root, key, value, &(bs->root));
@@ -475,6 +475,8 @@ static int hash_pbn_delete_btree(struct btree_store *bs, void *key, int32_t ksiz
 			return r;
 		}
 	} while (r>=0);
+
+	return 0;
 }
 static int hash_pbn_search_btree(struct btree_store *bs, void *key, int32_t ksize,
 	void *value, int32_t *vsize)
@@ -511,6 +513,8 @@ static int hash_pbn_search_btree(struct btree_store *bs, void *key, int32_t ksiz
 			return r;
 		}
 	} while (r >= 0);
+
+	return 0;
 }
 static int hash_pbn_insert_btree(struct btree_store *bs, void *key, int32_t ksize,
 	void *value, int32_t vsize)
@@ -547,6 +551,8 @@ static int hash_pbn_insert_btree(struct btree_store *bs, void *key, int32_t ksiz
 			return r;
 		}
 	} while (r >= 0);
+
+	return 0;
 }
 static struct btree_store *hash_pbn_create_btree(struct metadata *md, uint32_t ksize,
 	uint32_t vsize, uint32_t kmax, int unformatted)

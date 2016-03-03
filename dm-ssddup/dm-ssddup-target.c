@@ -115,6 +115,7 @@ static int parse_ssddup_args(struct ssddup_args *sa, int argc, char **argv, char
 		*err = "ERR Unsupported hash algorithm";
 		return -EINVAL;
 	}
+	return 0;
 }
 
 static int dm_ssddup_ctr(struct dm_target *ti, unsigned int argc, char **argv)
@@ -313,7 +314,7 @@ static void dm_ssddup_dtr(struct dm_target *ti)
 
 static struct target_type dm_ssddup_target = {
 	.name = "ssddup",
-	.version = {0, 0, 1},
+	.version = {1, 0, 0},
 	.module = THIS_MODULE,
 	.ctr = dm_ssddup_ctr,
 	.dtr = dm_ssddup_dtr,
@@ -327,6 +328,8 @@ int __init dm_ssddup_init(void)
 	r = dm_register_target(&dm_ssddup_target);
 	if (r)
 		return r;
+
+	return 0;
 }
 
 void __exit dm_ssddup_exit(void)
