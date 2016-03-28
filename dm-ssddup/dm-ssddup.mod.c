@@ -77,4 +77,4 @@ __attribute__((section(".modinfo"))) =
 "depends=dm-persistent-data,dm-mod";
 
 
-MODULE_INFO(srcversion, "EAE7DAC34A5E96497D497FE");
+MODULE_INFO(srcversion, "976ACAF92F0CFA2CDDE93E7");

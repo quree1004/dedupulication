@@ -92,7 +92,7 @@ static int __commit_transaction(struct metadata *md)
 		goto unlock;
 
 	r = dm_tm_commit(md->tm, sblock);
-	DMINFO("dm_tm_commit called");
+	return r;
 unlock :
 	dm_bm_unlock(sblock);
 	return r;
