@@ -1,0 +1,150 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+CRYPTO_ALG_NAME_LEN	dm-ssddup-target.h	29;"	d
+DATA_SUPERBLOCK_LOCATION	dm-ssddup-meta.c	10;"	d	file:
+DEDUP_HASH_DESC_COUNT	dm-ssddup-hash.h	16;"	d
+DM_DEDUP_HASH_H	dm-ssddup-hash.h	14;"	d
+DM_MSG_PREFIX	dm-ssddup-target.h	33;"	d
+KDIR	Makefile	/^KDIR:=\/lib\/modules\/$(shell uname -r)\/build$/;"	m
+KERNELDIR	Makefile	/^KERNELDIR=\/lib\/modules\/$(shell uname -r)\/build$/;"	m
+MAX_BACKEND_NAME_LEN	dm-ssddup-target.c	9;"	d	file:
+MAX_DATA_DEV_BLOCK_SIZE	dm-ssddup-target.c	12;"	d	file:
+MAX_DEV_NAME_LEN	dm-ssddup-target.c	8;"	d	file:
+MAX_DIGEST_SIZE	dm-ssddup-target.h	30;"	d
+METADATA_BSIZE	dm-ssddup-meta.c	11;"	d	file:
+METADATA_CACHESIZE	dm-ssddup-meta.c	12;"	d	file:
+METADATA_MAXLOCKS	dm-ssddup-meta.c	13;"	d	file:
+MIN_DATA_DEV_BLOCK_SIZE	dm-ssddup-target.c	11;"	d	file:
+MIN_DEDUP_WORK_IO	dm-ssddup-target.h	32;"	d
+PWD	Makefile	/^PWD:=$(shell pwd)$/;"	m
+SPACE_MAP_ROOT_SIZE	dm-ssddup-meta.h	25;"	d
+_DM_SSDDUP_H	dm-ssddup-target.h	2;"	d
+_SSDDUP_META_H	dm-ssddup-meta.h	2;"	d
+__begin_transaction	dm-ssddup-meta.c	/^static int __begin_transaction(struct metadata *md)$/;"	f	file:
+__commit_transaction	dm-ssddup-meta.c	/^static int __commit_transaction(struct metadata *md)$/;"	f	file:
+__superblock_all_zeros	dm-ssddup-meta.c	/^static int __superblock_all_zeros(struct dm_block_manager *bm, int *result)$/;"	f	file:
+__write_initial_superblock	dm-ssddup-meta.c	/^static int __write_initial_superblock(struct metadata *md)$/;"	f	file:
+alloc_data_block	dm-ssddup-meta.c	/^static int alloc_data_block(struct metadata *md, uint64_t *blockn)$/;"	f	file:
+alloc_data_block	dm-ssddup-meta.h	/^	int(*alloc_data_block)(struct metadata *md, uint64_t *blockn);$/;"	m	struct:metadata_ops
+bio	dm-ssddup-target.c	/^	struct bio *bio;$/;"	m	struct:ssddup_work	typeref:struct:ssddup_work::bio	file:
+blk_size	dm-ssddup-target.h	/^	uint32_t blk_size;$/;"	m	struct:ssddup_c
+blocknr	dm-ssddup-meta.h	/^	__le64 blocknr;	\/* This block number, dm_block_t. *\/$/;"	m	struct:metadata_superblock
+blocks	dm-ssddup-meta.h	/^	uint64_t blocks;$/;"	m	struct:init_btree_param
+bops	dm-ssddup-meta.c	/^	struct btree_ops bops;$/;"	m	struct:btree_store	typeref:struct:btree_store::btree_ops	file:
+bs_create_hash_pbn	dm-ssddup-meta.h	/^	struct btree_store * (*bs_create_hash_pbn)(struct metadata *md,$/;"	m	struct:metadata_ops	typeref:struct:metadata_ops::bs_create_hash_pbn
+bs_create_lbn_pbn	dm-ssddup-meta.h	/^	struct btree_store * (*bs_create_lbn_pbn)(struct metadata *md,$/;"	m	struct:metadata_ops	typeref:struct:metadata_ops::bs_create_lbn_pbn
+bs_hash_pbn	dm-ssddup-meta.h	/^	struct btree_store *bs_hash_pbn;$/;"	m	struct:metadata	typeref:struct:metadata::btree_store
+bs_lbn_pbn	dm-ssddup-meta.h	/^	struct btree_store *bs_lbn_pbn;$/;"	m	struct:metadata	typeref:struct:metadata::btree_store
+btree_delete	dm-ssddup-meta.h	/^	int(*btree_delete)(struct btree_store *bs, void *key, int32_t ksize);$/;"	m	struct:btree_ops
+btree_insert	dm-ssddup-meta.h	/^	int(*btree_insert)(struct btree_store *bs, void *key, int32_t ksize,$/;"	m	struct:btree_ops
+btree_ops	dm-ssddup-meta.h	/^struct btree_ops {$/;"	s
+btree_search	dm-ssddup-meta.h	/^	int(*btree_search)(struct btree_store *bs, void *key, int32_t ksize,$/;"	m	struct:btree_ops
+btree_store	dm-ssddup-meta.c	/^struct btree_store {$/;"	s	file:
+compute_hash_bio	dm-ssddup-hash.c	/^int compute_hash_bio(struct hash_desc_table *desc_table,$/;"	f
+crypto_alg	dm-ssddup-target.h	/^	char crypto_alg[CRYPTO_ALG_NAME_LEN];$/;"	m	struct:ssddup_c
+crypto_key_size	dm-ssddup-target.h	/^	int crypto_key_size;$/;"	m	struct:ssddup_c
+csum	dm-ssddup-meta.h	/^	__le32 csum;$/;"	m	struct:metadata_superblock
+data_block_size	dm-ssddup-meta.h	/^	__le32 data_block_size;	\/* In bytes *\/$/;"	m	struct:metadata_superblock
+data_dev	dm-ssddup-target.c	/^	struct dm_dev *data_dev;$/;"	m	struct:ssddup_args	typeref:struct:ssddup_args::dm_dev	file:
+data_dev	dm-ssddup-target.h	/^	struct dm_dev *data_dev;$/;"	m	struct:ssddup_c	typeref:struct:ssddup_c::dm_dev
+data_sm	dm-ssddup-meta.h	/^	struct dm_space_map *data_sm;$/;"	m	struct:metadata	typeref:struct:metadata::dm_space_map
+data_space_map_root	dm-ssddup-meta.h	/^	__u8 data_space_map_root[SPACE_MAP_ROOT_SIZE]; \/* Data space map *\/$/;"	m	struct:metadata_superblock
+dec_refcnt	dm-ssddup-meta.c	/^static int dec_refcnt(struct metadata *md, uint64_t blockn)$/;"	f	file:
+dec_refcount	dm-ssddup-meta.h	/^	int(*dec_refcount)(struct metadata *md, uint64_t blockn);$/;"	m	struct:metadata_ops
+desc	dm-ssddup-hash.h	/^	struct hash_desc desc[DEDUP_HASH_DESC_COUNT];$/;"	m	struct:hash_desc_table	typeref:struct:hash_desc_table::hash_desc
+desc_table	dm-ssddup-target.h	/^	struct hash_desc_table *desc_table;$/;"	m	struct:ssddup_c	typeref:struct:ssddup_c::hash_desc_table
+desc_table_deinit	dm-ssddup-hash.c	/^void desc_table_deinit(struct hash_desc_table *desc_table)$/;"	f
+desc_table_init	dm-ssddup-hash.c	/^struct hash_desc_table *desc_table_init(char *hash_alg)$/;"	f
+destroy_ssddup_args	dm-ssddup-target.c	/^static void destroy_ssddup_args(struct ssddup_args *sa)$/;"	f	file:
+dm-ssddup-y	Makefile	/^dm-ssddup-y := dm-ssddup-target.o dm-ssddup-hash.o dm-ssddup-meta.o$/;"	m
+dm_ssddup_ctr	dm-ssddup-target.c	/^static int dm_ssddup_ctr(struct dm_target *ti, unsigned int argc, char **argv)$/;"	f	file:
+dm_ssddup_dtr	dm-ssddup-target.c	/^static void dm_ssddup_dtr(struct dm_target *ti)$/;"	f	file:
+dm_ssddup_exit	dm-ssddup-target.c	/^module_exit(dm_ssddup_exit);$/;"	v
+dm_ssddup_exit	dm-ssddup-target.c	/^void __exit dm_ssddup_exit(void)$/;"	f
+dm_ssddup_init	dm-ssddup-target.c	/^int __init dm_ssddup_init(void)$/;"	f
+dm_ssddup_init	dm-ssddup-target.c	/^module_init(dm_ssddup_init);$/;"	v
+dm_ssddup_map	dm-ssddup-target.c	/^static int dm_ssddup_map(struct dm_target *ti, struct bio *bio)$/;"	f	file:
+dm_ssddup_target	dm-ssddup-target.c	/^static struct target_type dm_ssddup_target = {$/;"	v	typeref:struct:target_type	file:
+entry_size	dm-ssddup-meta.c	/^	uint32_t entry_size;$/;"	m	struct:btree_store	file:
+exit_btree	dm-ssddup-meta.c	/^static void exit_btree(struct metadata *md)$/;"	f	file:
+exit_meta	dm-ssddup-meta.h	/^	void(*exit_meta)(struct metadata *md);$/;"	m	struct:metadata_ops
+flags	dm-ssddup-meta.h	/^	__le32 flags; \/* General purpose flags. Not used. *\/$/;"	m	struct:metadata_superblock
+flush_btree	dm-ssddup-meta.c	/^static int flush_btree(struct metadata *md)$/;"	f	file:
+flush_limit	dm-ssddup-target.h	/^	uint32_t flush_limit;$/;"	m	struct:ssddup_c
+flush_meta	dm-ssddup-meta.h	/^	int(*flush_meta)(struct metadata *md);$/;"	m	struct:metadata_ops
+free_bitmap	dm-ssddup-hash.h	/^	bool free_bitmap[DEDUP_HASH_DESC_COUNT];$/;"	m	struct:hash_desc_table
+get_hash_digestsize	dm-ssddup-hash.c	/^unsigned int get_hash_digestsize(struct hash_desc_table *desc_table)$/;"	f
+get_next_slot	dm-ssddup-hash.c	/^static int get_next_slot(struct hash_desc_table *desc_table)$/;"	f	file:
+get_private_data	dm-ssddup-meta.h	/^	int(*get_private_data)(struct metadata *md, void **data,$/;"	m	struct:metadata_ops
+get_refcnt	dm-ssddup-meta.c	/^static int get_refcnt(struct metadata *md, uint64_t blockn)$/;"	f	file:
+get_refcount	dm-ssddup-meta.h	/^	int(*get_refcount)(struct metadata *md, uint64_t blockn);$/;"	m	struct:metadata_ops
+hash_algo	dm-ssddup-target.c	/^	char hash_algo[CRYPTO_ALG_NAME_LEN];$/;"	m	struct:ssddup_args	file:
+hash_desc_table	dm-ssddup-hash.h	/^struct hash_desc_table {$/;"	s
+hash_pbn_create_btree	dm-ssddup-meta.c	/^static struct btree_store *hash_pbn_create_btree(struct metadata *md, uint32_t ksize,$/;"	f	file:
+hash_pbn_delete_btree	dm-ssddup-meta.c	/^static int hash_pbn_delete_btree(struct btree_store *bs, void *key, int32_t ksize)$/;"	f	file:
+hash_pbn_insert_btree	dm-ssddup-meta.c	/^static int hash_pbn_insert_btree(struct btree_store *bs, void *key, int32_t ksize,$/;"	f	file:
+hash_pbn_root	dm-ssddup-meta.h	/^	__le64 hash_pbn_root;$/;"	m	struct:metadata_superblock
+hash_pbn_search_btree	dm-ssddup-meta.c	/^static int hash_pbn_search_btree(struct btree_store *bs, void *key, int32_t ksize,$/;"	f	file:
+hash_pbn_store	dm-ssddup-target.h	/^	struct btree_store *hash_pbn_store;$/;"	m	struct:ssddup_c	typeref:struct:ssddup_c::btree_store
+inc_refcnt	dm-ssddup-meta.c	/^static int inc_refcnt(struct metadata *md, uint64_t blockn)$/;"	f	file:
+inc_refcount	dm-ssddup-meta.h	/^	int(*inc_refcount)(struct metadata *md, uint64_t blockn);$/;"	m	struct:metadata_ops
+init_btree	dm-ssddup-meta.c	/^static struct metadata *init_btree(void * param, int *unformatted)$/;"	f	file:
+init_btree_param	dm-ssddup-meta.h	/^struct init_btree_param{$/;"	s
+init_meta	dm-ssddup-meta.h	/^	struct metadata * (*init_meta)(void *init_param, int *unformatted);$/;"	m	struct:metadata_ops	typeref:struct:metadata_ops::init_meta
+io_client	dm-ssddup-target.h	/^	struct dm_io_client *io_client;$/;"	m	struct:ssddup_c	typeref:struct:ssddup_c::dm_io_client
+key_size	dm-ssddup-meta.c	/^	uint32_t key_size;$/;"	m	struct:btree_store	file:
+lbn_pbn_create_btree	dm-ssddup-meta.c	/^static struct btree_store *lbn_pbn_create_btree(struct metadata *md, uint32_t ksize,$/;"	f	file:
+lbn_pbn_delete_btree	dm-ssddup-meta.c	/^static int lbn_pbn_delete_btree(struct btree_store *bs, void *key, int32_t ksize)$/;"	f	file:
+lbn_pbn_insert_btree	dm-ssddup-meta.c	/^static int lbn_pbn_insert_btree(struct btree_store *bs, void *key, int32_t kszie,$/;"	f	file:
+lbn_pbn_root	dm-ssddup-meta.h	/^	__le64 lbn_pbn_root;$/;"	m	struct:metadata_superblock
+lbn_pbn_search_btree	dm-ssddup-meta.c	/^static int lbn_pbn_search_btree(struct btree_store *bs, void *key, int32_t kszie,$/;"	f	file:
+lbn_pbn_store	dm-ssddup-target.h	/^	struct btree_store *lbn_pbn_store;$/;"	m	struct:ssddup_c	typeref:struct:ssddup_c::btree_store
+logical_blk_counter	dm-ssddup-target.h	/^	uint64_t logical_blk_counter;$/;"	m	struct:ssddup_c
+logical_blks	dm-ssddup-target.h	/^	uint32_t logical_blks;$/;"	m	struct:ssddup_c
+logical_block_counter	dm-ssddup-target.c	/^	uint64_t logical_block_counter;$/;"	m	struct:on_disk_stats	file:
+magic	dm-ssddup-meta.h	/^	__le64 magic; \/* Magic number to check against *\/$/;"	m	struct:metadata_superblock
+md	dm-ssddup-target.h	/^	struct metadata *md;$/;"	m	struct:ssddup_c	typeref:struct:ssddup_c::metadata
+mdops	dm-ssddup-target.h	/^	struct metadata_ops *mdops;$/;"	m	struct:ssddup_c	typeref:struct:ssddup_c::metadata_ops
+meta_bdev	dm-ssddup-meta.h	/^	struct block_device *meta_bdev;$/;"	m	struct:init_btree_param	typeref:struct:init_btree_param::block_device
+meta_bm	dm-ssddup-meta.h	/^	struct dm_block_manager *meta_bm;$/;"	m	struct:metadata	typeref:struct:metadata::dm_block_manager
+meta_dev	dm-ssddup-target.c	/^	struct dm_dev *meta_dev;$/;"	m	struct:ssddup_args	typeref:struct:ssddup_args::dm_dev	file:
+meta_dev	dm-ssddup-target.h	/^	struct dm_dev *meta_dev;$/;"	m	struct:ssddup_c	typeref:struct:ssddup_c::dm_dev
+meta_sm	dm-ssddup-meta.h	/^	struct dm_space_map *meta_sm;$/;"	m	struct:metadata	typeref:struct:metadata::dm_space_map
+metadata	dm-ssddup-meta.h	/^struct metadata {$/;"	s
+metadata_block_size	dm-ssddup-meta.h	/^	__le32 metadata_block_size; \/* In bytes *\/$/;"	m	struct:metadata_superblock
+metadata_nr_blocks	dm-ssddup-meta.h	/^	__le64 metadata_nr_blocks;\/* Number of metadata blocks used. *\/$/;"	m	struct:metadata_superblock
+metadata_ops	dm-ssddup-meta.h	/^struct metadata_ops {$/;"	s
+metadata_ops_btree	dm-ssddup-meta.c	/^struct metadata_ops metadata_ops_btree = {$/;"	v	typeref:struct:metadata_ops
+metadata_space_map_root	dm-ssddup-meta.h	/^	__u8 metadata_space_map_root[SPACE_MAP_ROOT_SIZE];\/* Metadata space map *\/$/;"	m	struct:metadata_superblock
+metadata_superblock	dm-ssddup-meta.h	/^struct metadata_superblock {$/;"	s
+obj-m	Makefile	/^obj-m=dm-ssddup.o$/;"	m
+on_disk_stats	dm-ssddup-target.c	/^struct on_disk_stats {$/;"	s	file:
+parse_ssddup_args	dm-ssddup-target.c	/^static int parse_ssddup_args(struct ssddup_args *sa, int argc, char **argv, char **err)$/;"	f	file:
+physical_blk_counter	dm-ssddup-target.h	/^	uint64_t physical_blk_counter;$/;"	m	struct:ssddup_c
+physical_blks	dm-ssddup-target.h	/^	uint32_t physical_blks;$/;"	m	struct:ssddup_c
+physical_block_counter	dm-ssddup-target.c	/^	uint64_t physical_block_counter;$/;"	m	struct:on_disk_stats	file:
+process_bio	dm-ssddup-target.c	/^static void process_bio(struct work_struct *ws)$/;"	f	file:
+put_slot	dm-ssddup-hash.c	/^static void put_slot(struct hash_desc_table *desc_table, unsigned long slot)$/;"	f	file:
+root	dm-ssddup-meta.c	/^	uint64_t root;$/;"	m	struct:btree_store	file:
+sc	dm-ssddup-target.c	/^	struct ssddup_c *sc;$/;"	m	struct:ssddup_work	typeref:struct:ssddup_work::ssddup_c	file:
+sector_num_per_blk	dm-ssddup-target.h	/^	uint32_t sector_num_per_blk;$/;"	m	struct:ssddup_c
+set_private_data	dm-ssddup-meta.h	/^	int(*set_private_data)(struct metadata *md, void *data, uint32_t size);$/;"	m	struct:metadata_ops
+slot_counter	dm-ssddup-hash.h	/^	atomic_long_t slot_counter;$/;"	m	struct:hash_desc_table
+slot_to_desc	dm-ssddup-hash.c	/^static struct hash_desc *slot_to_desc(struct hash_desc_table *desc_table,$/;"	f	file:
+ssddup_args	dm-ssddup-target.c	/^struct ssddup_args{$/;"	s	file:
+ssddup_c	dm-ssddup-target.h	/^struct ssddup_c{$/;"	s
+ssddup_mempool	dm-ssddup-target.h	/^	mempool_t * ssddup_mempool;$/;"	m	struct:ssddup_c
+ssddup_work	dm-ssddup-target.c	/^struct ssddup_work {$/;"	s	file:
+ti	dm-ssddup-target.c	/^	struct dm_target *ti;$/;"	m	struct:ssddup_args	typeref:struct:ssddup_args::dm_target	file:
+tm	dm-ssddup-meta.h	/^	struct dm_transaction_manager *tm;$/;"	m	struct:metadata	typeref:struct:metadata::dm_transaction_manager
+tree_info	dm-ssddup-meta.c	/^	struct dm_btree_info tree_info;$/;"	m	struct:btree_store	typeref:struct:btree_store::dm_btree_info	file:
+uuid	dm-ssddup-meta.h	/^	__u8 uuid[16]; \/* UUID of device (Not used) *\/$/;"	m	struct:metadata_superblock
+value_size	dm-ssddup-meta.c	/^	uint32_t value_size;$/;"	m	struct:btree_store	file:
+version	dm-ssddup-meta.h	/^	__le32 version;	\/* Metadata root version *\/$/;"	m	struct:metadata_superblock
+worker	dm-ssddup-target.c	/^	struct work_struct worker;$/;"	m	struct:ssddup_work	typeref:struct:ssddup_work::work_struct	file:
+workqueue	dm-ssddup-target.h	/^	struct workqueue_struct *workqueue;$/;"	m	struct:ssddup_c	typeref:struct:ssddup_c::workqueue_struct
+writes_cnt_for_flush	dm-ssddup-target.h	/^	uint64_t writes_cnt_for_flush;$/;"	m	struct:ssddup_c

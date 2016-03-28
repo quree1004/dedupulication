@@ -36,9 +36,11 @@ static int __begin_transaction(struct metadata *md)
 		return r;
 
 	disk_super = dm_block_data(sblock);
-	
-	md->bs_hash_pbn->root = le64_to_cpu(disk_super->hash_pbn_root);
-	md->bs_lbn_pbn->root = le64_to_cpu(disk_super->lbn_pbn_root);
+
+	if (md->bs_hash_pbn)
+		md->bs_hash_pbn->root = le64_to_cpu(disk_super->hash_pbn_root);
+	if (md->bs_lbn_pbn)
+		md->bs_lbn_pbn->root = le64_to_cpu(disk_super->lbn_pbn_root);
 
 	dm_bm_unlock(sblock);
 
