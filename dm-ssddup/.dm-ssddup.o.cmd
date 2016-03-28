@@ -1,0 +1,1 @@
+cmd_/root/dedup/dm-ssddup/dm-ssddup.o := ld -m elf_x86_64   -r -o /root/dedup/dm-ssddup/dm-ssddup.o /root/dedup/dm-ssddup/dm-ssddup-target.o /root/dedup/dm-ssddup/dm-ssddup-hash.o /root/dedup/dm-ssddup/dm-ssddup-meta.o ; scripts/mod/modpost /root/dedup/dm-ssddup/dm-ssddup.o

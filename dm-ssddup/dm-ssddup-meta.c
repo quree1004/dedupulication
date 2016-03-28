@@ -7,7 +7,7 @@
 
 #include "dm-ssddup-meta.h"
 
-#define	MEATDATA_SUPERBLOCK_LOCATION	0
+#define	METADATA_SUPERBLOCK_LOCATION	0
 #define	METADATA_BSIZE				4096
 #define METADATA_CACHESIZE			64
 #define METADATA_MAXLOCKS			5
@@ -92,7 +92,7 @@ static int __commit_transaction(struct metadata *md)
 		goto unlock;
 
 	r = dm_tm_commit(md->tm, sblock);
-
+	DMINFO("dm_tm_commit called");
 unlock :
 	dm_bm_unlock(sblock);
 	return r;
@@ -414,12 +414,12 @@ static struct btree_store *lbn_pbn_create_btree(struct metadata *md, uint32_t ks
 	bs->tree_info.value_type.dec = NULL;
 	bs->tree_info.value_type.equal = NULL;
 
-	bs->bops.btree_delete = lbn_pbn_delete_btree;
-	bs->bops.btree_search = lbn_pbn_search_btree;
-	bs->bops.btree_insert = lbn_pbn_insert_btree;
-
 
 	if(!unformatted){
+		bs->bops.btree_delete = lbn_pbn_delete_btree;
+		bs->bops.btree_search = lbn_pbn_search_btree;
+		bs->bops.btree_insert = lbn_pbn_insert_btree;
+
 		md->bs_lbn_pbn = bs;
 		__begin_transaction(md);
 	}
@@ -431,8 +431,12 @@ static struct btree_store *lbn_pbn_create_btree(struct metadata *md, uint32_t ks
 			kfree(bs);
 			return bs;
 		}
-		md->bs_lbn_pbn = bs;
 		flush_btree(md);
+		bs->bops.btree_delete = lbn_pbn_delete_btree;
+		bs->bops.btree_search = lbn_pbn_search_btree;
+		bs->bops.btree_insert = lbn_pbn_insert_btree;
+
+		md->bs_lbn_pbn = bs;
 	}
 
 	return bs;

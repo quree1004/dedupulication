@@ -1,0 +1,1 @@
+cmd_/root/dedup/dm-ssddup/dm-ssddup.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /root/dedup/dm-ssddup/dm-ssddup.ko /root/dedup/dm-ssddup/dm-ssddup.o /root/dedup/dm-ssddup/dm-ssddup.mod.o
