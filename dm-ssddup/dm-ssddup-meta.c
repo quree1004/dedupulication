@@ -7,7 +7,7 @@
 
 #include "dm-ssddup-meta.h"
 
-#define	DATA_SUPERBLOCK_LOCATION	0
+#define	MEATDATA_SUPERBLOCK_LOCATION	0
 #define	METADATA_BSIZE				4096
 #define METADATA_CACHESIZE			64
 #define METADATA_MAXLOCKS			5
@@ -29,7 +29,7 @@ static int __begin_transaction(struct metadata *md)
 	struct metadata_superblock *disk_super;
 	struct dm_block *sblock;
 
-	r = dm_bm_read_lock(md->meta_bm, DATA_SUPERBLOCK_LOCATION,
+	r = dm_bm_read_lock(md->meta_bm, METADATA_SUPERBLOCK_LOCATION,
 				NULL, &sblock);
 
 	if(r)
@@ -64,22 +64,24 @@ static int __commit_transaction(struct metadata *md)
 	if(r < 0) 
 		return r;
 
-	r = dm_sm_root_size(md->data_sm, &data_len);
-	if(r < 0) 
-		return r;
-
 	r = dm_sm_root_size(md->meta_sm, &meta_len);
 	if(r < 0) 
 		return r;
 
-	r = dm_bm_write_lock(md->meta_bm, DATA_SUPERBLOCK_LOCATION, 
-				NULL, &sblock);
+	r = dm_sm_root_size(md->data_sm, &data_len);
 	if(r < 0) 
 		return r;
 
+	r = dm_bm_write_lock(md->meta_bm, METADATA_SUPERBLOCK_LOCATION, 
+				NULL, &sblock);
+	if(r) 
+		return r;
+
 	disk_super = dm_block_data(sblock);
-	disk_super->lbn_pbn_root = cpu_to_le64(md->bs_lbn_pbn->root);
-	disk_super->hash_pbn_root = cpu_to_le64(md->bs_hash_pbn->root);
+	if( md->bs_lbn_pbn)
+		disk_super->lbn_pbn_root = cpu_to_le64(md->bs_lbn_pbn->root);
+	if( md->bs_hash_pbn)
+		disk_super->hash_pbn_root = cpu_to_le64(md->bs_hash_pbn->root);
 
 	r = dm_sm_copy_root(md->meta_sm, &disk_super->metadata_space_map_root, meta_len);
 	if(r < 0) 
@@ -119,7 +121,7 @@ static int __write_initial_superblock(struct metadata *md)
 	if(r < 0) 
 		return r;
 
-	r = dm_bm_write_lock_zero(md->meta_bm, DATA_SUPERBLOCK_LOCATION, NULL, &sblock);
+	r = dm_bm_write_lock_zero(md->meta_bm, METADATA_SUPERBLOCK_LOCATION, NULL, &sblock);
 	if(r < 0) 
 		return r;
 
@@ -149,7 +151,7 @@ static int __superblock_all_zeros(struct dm_block_manager *bm, int *result)
 	/*
 	 *	 * We can't use a validator here - it may be all zeroes.
 	 *		 */
-	r = dm_bm_read_lock(bm, DATA_SUPERBLOCK_LOCATION, NULL, &b);
+	r = dm_bm_read_lock(bm, METADATA_SUPERBLOCK_LOCATION, NULL, &b);
 	if (r) return r;
 
 	data_le = dm_block_data(b);
@@ -199,14 +201,14 @@ static struct metadata *init_btree(void * param, int *unformatted)
 
 		md->meta_bm = meta_bm;
 
-		r = dm_bm_read_lock(meta_bm, DATA_SUPERBLOCK_LOCATION,
+		r = dm_bm_read_lock(meta_bm, METADATA_SUPERBLOCK_LOCATION,
 					NULL, &sblock);
 		if(r < 0) 
 			DMERR("read_lock superblock failed");
 
 		disk_super = dm_block_data(sblock);
 
-		r = dm_tm_open_with_sm(meta_bm, DATA_SUPERBLOCK_LOCATION,
+		r = dm_tm_open_with_sm(meta_bm, METADATA_SUPERBLOCK_LOCATION,
 					disk_super->metadata_space_map_root,
 					sizeof(disk_super->metadata_space_map_root),
 					&md->tm, &md->meta_sm);
@@ -223,7 +225,7 @@ static struct metadata *init_btree(void * param, int *unformatted)
 		goto begin_trans;
 	}
 
-	r = dm_tm_create_with_sm(meta_bm, DATA_SUPERBLOCK_LOCATION, &tm, &meta_sm);
+	r = dm_tm_create_with_sm(meta_bm, METADATA_SUPERBLOCK_LOCATION, &tm, &meta_sm);
 	if(r < 0){
 		md = ERR_PTR(r);
 		goto badtm;
