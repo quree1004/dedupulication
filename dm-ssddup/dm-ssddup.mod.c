@@ -45,6 +45,7 @@ __attribute__((section("__versions"))) = {
 	{ 0xf375d009, __VMLINUX_SYMBOL_STR(dm_bm_write_lock) },
 	{ 0x8c03d20c, __VMLINUX_SYMBOL_STR(destroy_workqueue) },
 	{ 0x42160169, __VMLINUX_SYMBOL_STR(flush_workqueue) },
+	{ 0x8ec87649, __VMLINUX_SYMBOL_STR(bio_endio) },
 	{ 0x4ea5d10, __VMLINUX_SYMBOL_STR(ksize) },
 	{ 0x7ade1071, __VMLINUX_SYMBOL_STR(dm_tm_destroy) },
 	{ 0x966a8838, __VMLINUX_SYMBOL_STR(dm_btree_lookup) },
@@ -77,4 +78,4 @@ __attribute__((section(".modinfo"))) =
 "depends=dm-persistent-data,dm-mod";
 
 
-MODULE_INFO(srcversion, "976ACAF92F0CFA2CDDE93E7");
+MODULE_INFO(srcversion, "50D2B54F378700595D54E51");

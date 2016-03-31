@@ -390,14 +390,20 @@ static struct btree_store *lbn_pbn_create_btree(struct metadata *md, uint32_t ks
 
 	int r;
 
-	if (!vsize || !ksize) 
+	if (!vsize || !ksize) {
+		DMINFO("vsize or ksize is 0");
 		return ERR_PTR(-ENOTSUPP);
+	}
 
-	if (ksize != 8) 
+	if (ksize != 8) {
+		DMINFO("ksize is not 8");
 		return ERR_PTR(-ENOTSUPP); // persistent data support until 64bit key
+	}
 	
-	if (md->bs_lbn_pbn) 
-		return ERR_PTR(-EBUSY);
+//	if (md->bs_lbn_pbn) {
+//		DMINFO("Already lbn_pbn_btree is created");
+//		return ERR_PTR(-EBUSY);
+//	}  
 
 	bs = kmalloc(sizeof(*bs), GFP_NOIO);
 	if (!bs) 
@@ -428,6 +434,7 @@ static struct btree_store *lbn_pbn_create_btree(struct metadata *md, uint32_t ks
 		r = dm_btree_empty(&(bs->tree_info), &(bs->root));
 		if(r < 0){
 			bs = ERR_PTR(r);
+			DMINFO("dm_btree_empty ERR in lbn_pbn_create_btree");
 			kfree(bs);
 			return bs;
 		}
@@ -435,8 +442,10 @@ static struct btree_store *lbn_pbn_create_btree(struct metadata *md, uint32_t ks
 		bs->bops.btree_delete = lbn_pbn_delete_btree;
 		bs->bops.btree_search = lbn_pbn_search_btree;
 		bs->bops.btree_insert = lbn_pbn_insert_btree;
-
+		
 		md->bs_lbn_pbn = bs;
+
+		DMINFO("unformatted in lbn_pbn_create_btree");
 	}
 
 	return bs;

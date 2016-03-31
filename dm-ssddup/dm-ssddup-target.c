@@ -64,7 +64,8 @@ static int dm_ssddup_map(struct dm_target *ti, struct bio *bio)
 //
 //out :
 //	return DM_MAPIO_SUBMITTED;
-	return DM_MAPIO_REMAPPED;
+	bio_endio(bio, 0);
+	return DM_MAPIO_SUBMITTED;
 }
 
 struct ssddup_args{
@@ -256,6 +257,8 @@ static int dm_ssddup_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 		goto bad_metastore_init;
 
 	ti->private = sc;
+
+	DMINFO("dm_ssddup_ctr is normally ended");
 
 	return 0;
 
